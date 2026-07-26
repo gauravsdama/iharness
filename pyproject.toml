@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iharness"
+version = "0.1.0"
+description = "A CLI for repeatable iOS Simulator build, test, launch, and verification workflows."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Gaurav Sdama" }
+]
+keywords = ["ios", "simulator", "xcode", "codex", "verification"]
+dependencies = []
+
+[project.scripts]
+iharness = "iharness.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["iharness*"]
