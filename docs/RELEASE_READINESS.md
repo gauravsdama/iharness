@@ -6,7 +6,7 @@ Status: **source-ready**. The repository is licensed under Apache-2.0, the offli
 
 - Intended user: iOS developers who want one repeatable Simulator build, test, install, launch, screenshot, and log workflow.
 - Employer-facing story: a dependency-free Python CLI that wraps Xcode and `simctl`, records every step, and makes verification artifacts easy to inspect or automate.
-- Repository: `gauravsdama/iharness`, private, not a GitHub fork, with one author in the local commit history.
+- Repository: `gauravsdama/iharness`, public, not a GitHub fork, with one author in the local commit history.
 - Source: first-party Python code. The runtime has no third-party Python dependencies and no vendored source or generated Xcode output is tracked.
 - Interface: CLI only. Simulator screenshots show the app under test, not an iHarness UI.
 
@@ -18,6 +18,7 @@ Status: **source-ready**. The repository is licensed under Apache-2.0, the offli
 - `python3 -m iharness verify --device "iPhone 17" --no-screenshot --log-seconds 0`: passed the doctor, Xcode-version, and iOS 26.2 Simulator boot steps with Xcode 26.5.
 - `python3 -m iharness verify --project fixtures/IHarnessFixture/IHarnessFixture.xcodeproj --target IHarnessFixture --sdk iphonesimulator --bundle-id dev.iharness.fixture --app .iharness/FixtureDerivedData/Build/Products/Debug-iphonesimulator/IHarnessFixture.app --device "iPhone 17" --derived-data .iharness/FixtureDerivedData --log-seconds 2 --out .iharness/fixture-e2e-final`: passed build, install, launch, delayed screenshot, and bounded logs.
 - The fixture screenshot was visually inspected and shows the expected `iHarness fixture ready` state. The verifier now waits two seconds after launch so evidence does not capture the Simulator home-screen transition.
+- GitHub Actions run `35034516771` passed both the clean-checkout offline install and the fixture XCTest workflow on the `macos-26` runner with an iPhone 17 and `OS=latest`.
 - The `v0.1.0` CI policy is one current toolchain: the `macos-26` runner and its `OS=latest` iPhone 17 Simulator runtime. A multi-Xcode/runtime compatibility matrix is intentionally deferred until after `v0.1.0`.
 
 ## Release boundary and blockers
