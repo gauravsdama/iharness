@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-26
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Test the clean checkout and offline installer
+        run: ./scripts/release_check.sh --publish
+      - name: Test the publishable fixture on the latest bundled runtime
+        run: >-
+          xcodebuild
+          -project fixtures/IHarnessFixture/IHarnessFixture.xcodeproj
+          -scheme IHarnessFixture
+          -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest'
+          test

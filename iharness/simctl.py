@@ -121,6 +121,8 @@ def take_screenshot(device: str, output_path: Path) -> CommandResult:
 
 
 def record_video(device: str, output_path: Path, *, seconds: int = 10) -> CommandResult:
+    if seconds <= 0:
+        raise ValueError("Video duration must be greater than zero seconds.")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     command = ["xcrun", "simctl", "io", device, "recordVideo", str(output_path)]
     start = time.monotonic()
@@ -142,7 +144,7 @@ def record_video(device: str, output_path: Path, *, seconds: int = 10) -> Comman
             process.kill()
             stdout, stderr = process.communicate()
     returncode = process.returncode
-    if timed_out and returncode in (-15, 0, 143):
+    if timed_out and returncode in (-2, 0, 130):
         returncode = 0
     return CommandResult(
         command=command,
@@ -161,6 +163,8 @@ def capture_logs(
     bundle_id: str | None = None,
     predicate: str | None = None,
 ) -> CommandResult:
+    if seconds <= 0:
+        raise ValueError("Log duration must be greater than zero seconds.")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     if predicate is None and bundle_id:
         predicate = f'process == "{bundle_id}" OR subsystem CONTAINS "{bundle_id}"'

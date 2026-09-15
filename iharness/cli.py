@@ -114,6 +114,7 @@ def add_config_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--app", dest="app_path", default=None, help="Path to built .app bundle.")
     parser.add_argument("--run-tests", action="store_true", default=None, help="Run xcodebuild test during verify.")
     parser.add_argument("--no-screenshot", action="store_true", help="Skip screenshot capture during verify.")
+    parser.add_argument("--launch-wait-seconds", type=float, default=None, help="Seconds to wait after launch before capturing evidence.")
     parser.add_argument("--log-seconds", type=int, default=None)
     parser.add_argument("--watch-path", action="append", dest="watch_paths", default=None)
     parser.add_argument("--watch-extension", action="append", dest="watch_extensions", default=None)
@@ -123,8 +124,11 @@ def add_xcode_args(parser: argparse.ArgumentParser, *, include_required: bool = 
     parser.add_argument("--workspace", default=None, help="Path to .xcworkspace.")
     parser.add_argument("--project", default=None, help="Path to .xcodeproj.")
     parser.add_argument("--scheme", default=None, required=False if not include_required else False)
+    parser.add_argument("--target", default=None, help="Xcode target name; useful with --sdk for build-only verification.")
+    parser.add_argument("--sdk", default=None, help="Explicit SDK such as iphonesimulator.")
     parser.add_argument("--configuration", default=None)
     parser.add_argument("--device", default=None, help="Simulator name or UDID.")
+    parser.add_argument("--build-destination", default=None, help="Explicit xcodebuild destination, such as 'generic/platform=iOS Simulator'.")
     parser.add_argument("--derived-data", default=None)
     parser.add_argument("--result-bundle", default=None)
     parser.add_argument("--extra-xcode-arg", action="append", default=None)
@@ -281,8 +285,11 @@ def config_overrides(args: argparse.Namespace) -> dict[str, object]:
         "workspace": getattr(args, "workspace", None),
         "project": getattr(args, "project", None),
         "scheme": getattr(args, "scheme", None),
+        "target": getattr(args, "target", None),
+        "sdk": getattr(args, "sdk", None),
         "configuration": getattr(args, "configuration", None),
         "device": getattr(args, "device", None),
+        "build_destination": getattr(args, "build_destination", None),
         "bundle_id": getattr(args, "bundle_id", None),
         "app_path": getattr(args, "app_path", None),
         "derived_data": getattr(args, "derived_data", None),
@@ -290,6 +297,7 @@ def config_overrides(args: argparse.Namespace) -> dict[str, object]:
         "extra_xcode_args": getattr(args, "extra_xcode_arg", None),
         "watch_paths": getattr(args, "watch_paths", None),
         "watch_extensions": getattr(args, "watch_extensions", None),
+        "launch_wait_seconds": getattr(args, "launch_wait_seconds", None),
         "log_seconds": getattr(args, "log_seconds", None),
     }
     run_tests = getattr(args, "run_tests", None)
@@ -305,8 +313,10 @@ def target_from_config(config: HarnessConfig) -> XcodeTarget:
         workspace=config.workspace,
         project=config.project,
         scheme=config.scheme,
+        target=config.target,
+        sdk=config.sdk,
         configuration=config.configuration,
-        device=config.device,
+        device=config.build_destination or (None if config.target and config.sdk else config.device),
         derived_data=config.derived_data,
         result_bundle=config.result_bundle,
         extra_args=config.extra_xcode_args,

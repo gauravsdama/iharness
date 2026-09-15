@@ -6,8 +6,8 @@ usage() {
 Usage: ./scripts/setup.sh [--check] [--prefix DIR] [--codex-home DIR] [--no-codex-skill]
 
 Installs an iharness launcher into DIR/bin (default: $HOME/.local/bin), with
-its isolated Python environment under DIR/lib/iharness-venv. It also installs
-the bundled Codex skill into $CODEX_HOME/skills/iharness (default: $HOME/.codex).
+the dependency-free Python package under DIR/lib/iharness. It also installs the
+bundled Codex skill into $CODEX_HOME/skills/iharness (default: $HOME/.codex).
 
 Options:
   --check             Validate prerequisites without writing files.
@@ -53,8 +53,8 @@ for command in python3 xcodebuild xcrun; do
   fi
 done
 
-if ! python3 -c 'import venv' >/dev/null 2>&1; then
-  echo "Python venv support is required for the selected Python 3 runtime." >&2
+if ! python3 -c 'import sys; raise SystemExit(sys.version_info < (3, 11))' >/dev/null 2>&1; then
+  echo "Python 3.11 or newer is required." >&2
   exit 1
 fi
 
@@ -63,14 +63,15 @@ if [ "$check_only" = true ]; then
   exit 0
 fi
 
-venv_dir="$prefix/lib/iharness-venv"
 mkdir -p "$prefix/bin" "$prefix/lib"
-python3 -m venv "$venv_dir"
-"$venv_dir/bin/python" -m pip install "$project_root"
+package_root="$prefix/lib/iharness"
+rm -rf "$package_root"
+mkdir -p "$package_root"
+cp "$project_root"/iharness/*.py "$package_root/"
 
 cat > "$prefix/bin/iharness" <<EOF
 #!/bin/sh
-exec "$venv_dir/bin/iharness" "\$@"
+PYTHONPATH="$prefix/lib" exec "$(command -v python3)" -m iharness "\$@"
 EOF
 chmod 755 "$prefix/bin/iharness"
 

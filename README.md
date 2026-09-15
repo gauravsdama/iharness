@@ -24,7 +24,7 @@ It is for developers and coding agents that need a readable record of what actua
 
 ### Standalone installation
 
-Use the setup script to install an isolated Python runtime and launcher under a prefix you control. The default prefix is `$HOME/.local`.
+Use the setup script to copy the dependency-free Python package and launcher under a prefix you control. The default prefix is `$HOME/.local`; installation does not fetch packages from the network.
 
 From a clone or release checkout:
 
@@ -58,6 +58,19 @@ iharness init \
 iharness verify --run-tests
 ```
 
+The repository includes the first-party `fixtures/IHarnessFixture` app used by CI and release verification. A local target/SDK run that tolerates an older installed Simulator runtime is:
+
+```sh
+python3 -m iharness verify \
+  --project fixtures/IHarnessFixture/IHarnessFixture.xcodeproj \
+  --target IHarnessFixture --sdk iphonesimulator \
+  --bundle-id dev.iharness.fixture \
+  --app .iharness/FixtureDerivedData/Build/Products/Debug-iphonesimulator/IHarnessFixture.app \
+  --device "iPhone 17" \
+  --derived-data .iharness/FixtureDerivedData \
+  --out .iharness/fixture-e2e
+```
+
 Each run writes artifacts to `.iharness/runs/<timestamp>/`:
 
 - `report.md` — concise human-readable result
@@ -70,6 +83,10 @@ Each run writes artifacts to `.iharness/runs/<timestamp>/`:
 The tool intentionally keeps Xcode inputs explicit. A useful verification configuration needs a `workspace` or `project`, `scheme`, `bundle_id`, and `app_path`. iHarness does not yet derive an app bundle from Xcode build settings; provide the bundle path you want installed.
 
 A run with no project/workspace can establish that Xcode and a Simulator are healthy, but it is not application verification. Do not treat a boot-only screenshot as evidence that an app works.
+
+When the installed Simulator runtime does not match Xcode's active SDK, use `--target APP_TARGET --sdk iphonesimulator` for a build-only verification while keeping `--device` pointed at the simulator used for install, launch, and evidence. XCTest still requires a concrete runtime compatible with the selected Xcode. `--build-destination` is available when an explicit scheme destination is preferred.
+
+The verifier waits two seconds after a successful launch before taking its screenshot so the evidence captures the application rather than the Simulator home-screen transition. Override this with `--launch-wait-seconds` when an application needs more or less startup time.
 
 ## Commands
 
@@ -95,7 +112,13 @@ iHarness is a local CLI, not an MCP service. Its supported Codex integration is 
 ## Development
 
 ```sh
-python3 -m unittest discover -v
+./scripts/release_check.sh
 ```
 
 Contributions should preserve explicit command inputs, bounded log/video capture, and inspection-friendly run artifacts. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+The project is licensed under Apache-2.0. A recorded end-to-end run against the bundled fixture app is tracked in the [release-readiness record](docs/RELEASE_READINESS.md).
+
+## License
+
+Copyright 2026 Gaurav Dama. Licensed under the [Apache License 2.0](LICENSE).

@@ -4,6 +4,7 @@ from datetime import datetime
 from pathlib import Path
 import platform
 import shutil
+import time
 
 from .config import HarnessConfig, resolve_path
 from .report import VerificationReport
@@ -45,8 +46,10 @@ def run_verification(config: HarnessConfig, *, cwd: Path, output_dir: Path | Non
             workspace=resolve_path(config.workspace, cwd),
             project=resolve_path(config.project, cwd),
             scheme=config.scheme,
+            target=config.target,
+            sdk=config.sdk,
             configuration=config.configuration,
-            device=device.udid,
+            device=config.build_destination or (None if config.target and config.sdk else device.udid),
             derived_data=resolve_path(config.derived_data, cwd) or config.derived_data,
             result_bundle=resolve_path(config.result_bundle, cwd) if config.result_bundle else None,
             extra_args=config.extra_xcode_args,
@@ -83,6 +86,8 @@ def run_verification(config: HarnessConfig, *, cwd: Path, output_dir: Path | Non
         if not launch_result.ok:
             report.write()
             return report
+        if config.launch_wait_seconds > 0:
+            time.sleep(config.launch_wait_seconds)
 
     if config.screenshot:
         screenshot_path = report.output_dir / "screenshot.png"

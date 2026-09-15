@@ -1,0 +1,78 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		200000000000000000000001 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000001 /* AppDelegate.swift */; };
+		200000000000000000000002 /* FixtureStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000002 /* FixtureStatus.swift */; };
+		200000000000000000000003 /* FixtureStatusTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 300000000000000000000004 /* FixtureStatusTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		400000000000000000000001 = {isa = PBXContainerItemProxy; containerPortal = 500000000000000000000001 /* Project object */; proxyType = 1; remoteGlobalIDString = 100000000000000000000001; remoteInfo = IHarnessFixture; };
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		300000000000000000000001 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		300000000000000000000002 /* FixtureStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixtureStatus.swift; sourceTree = "<group>"; };
+		300000000000000000000003 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		300000000000000000000004 /* FixtureStatusTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixtureStatusTests.swift; sourceTree = "<group>"; };
+		300000000000000000000005 /* IHarnessFixture.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IHarnessFixture.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		300000000000000000000006 /* IHarnessFixtureTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = IHarnessFixtureTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		600000000000000000000001 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		600000000000000000000002 = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		700000000000000000000001 = {isa = PBXGroup; children = (700000000000000000000002 /* IHarnessFixture */, 700000000000000000000003 /* IHarnessFixtureTests */, 700000000000000000000004 /* Products */); sourceTree = "<group>"; };
+		700000000000000000000002 /* IHarnessFixture */ = {isa = PBXGroup; children = (300000000000000000000001 /* AppDelegate.swift */, 300000000000000000000002 /* FixtureStatus.swift */, 300000000000000000000003 /* Info.plist */); path = IHarnessFixture; sourceTree = "<group>"; };
+		700000000000000000000003 /* IHarnessFixtureTests */ = {isa = PBXGroup; children = (300000000000000000000004 /* FixtureStatusTests.swift */); path = IHarnessFixtureTests; sourceTree = "<group>"; };
+		700000000000000000000004 /* Products */ = {isa = PBXGroup; children = (300000000000000000000005 /* IHarnessFixture.app */, 300000000000000000000006 /* IHarnessFixtureTests.xctest */); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		100000000000000000000001 /* IHarnessFixture */ = {isa = PBXNativeTarget; buildConfigurationList = 800000000000000000000002 /* Build configuration list for PBXNativeTarget "IHarnessFixture" */; buildPhases = (900000000000000000000001 /* Sources */, 600000000000000000000001 /* Frameworks */, 900000000000000000000003 /* Resources */); buildRules = (); dependencies = (); name = IHarnessFixture; productName = IHarnessFixture; productReference = 300000000000000000000005 /* IHarnessFixture.app */; productType = "com.apple.product-type.application"; };
+		100000000000000000000002 /* IHarnessFixtureTests */ = {isa = PBXNativeTarget; buildConfigurationList = 800000000000000000000003 /* Build configuration list for PBXNativeTarget "IHarnessFixtureTests" */; buildPhases = (900000000000000000000002 /* Sources */, 600000000000000000000002 /* Frameworks */, 900000000000000000000004 /* Resources */); buildRules = (); dependencies = (A00000000000000000000001 /* PBXTargetDependency */); name = IHarnessFixtureTests; productName = IHarnessFixtureTests; productReference = 300000000000000000000006 /* IHarnessFixtureTests.xctest */; productType = "com.apple.product-type.bundle.unit-test"; };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		500000000000000000000001 /* Project object */ = {isa = PBXProject; attributes = {BuildIndependentTargetsInParallel = 1; LastSwiftUpdateCheck = 2650; LastUpgradeCheck = 2650; TargetAttributes = {100000000000000000000001 = {CreatedOnToolsVersion = 26.5; }; 100000000000000000000002 = {CreatedOnToolsVersion = 26.5; TestTargetID = 100000000000000000000001; }; }; }; buildConfigurationList = 800000000000000000000001 /* Build configuration list for PBXProject "IHarnessFixture" */; compatibilityVersion = "Xcode 14.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = 700000000000000000000001; productRefGroup = 700000000000000000000004 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (100000000000000000000001 /* IHarnessFixture */, 100000000000000000000002 /* IHarnessFixtureTests */); };
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		900000000000000000000003 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		900000000000000000000004 = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		900000000000000000000001 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (200000000000000000000001 /* AppDelegate.swift in Sources */, 200000000000000000000002 /* FixtureStatus.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
+		900000000000000000000002 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (200000000000000000000003 /* FixtureStatusTests.swift in Sources */); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A00000000000000000000001 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = 100000000000000000000001 /* IHarnessFixture */; targetProxy = 400000000000000000000001; };
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		B00000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; COPY_PHASE_STRIP = NO; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_TESTABILITY = YES; GCC_C_LANGUAGE_STANDARD = gnu17; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)"; SWIFT_OPTIMIZATION_LEVEL = "-Onone"; }; name = Debug; };
+		B00000000000000000000002 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; COPY_PHASE_STRIP = NO; DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym"; GCC_C_LANGUAGE_STANDARD = gnu17; IPHONEOS_DEPLOYMENT_TARGET = 17.0; SDKROOT = iphoneos; SWIFT_COMPILATION_MODE = wholemodule; VALIDATE_PRODUCT = YES; }; name = Release; };
+		B00000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = IHarnessFixture/Info.plist; MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = dev.iharness.fixture; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = auto; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; }; name = Debug; };
+		B00000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = IHarnessFixture/Info.plist; MARKETING_VERSION = 1.0; PRODUCT_BUNDLE_IDENTIFIER = dev.iharness.fixture; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = auto; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SUPPORTS_MACCATALYST = NO; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; }; name = Release; };
+		B00000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; PRODUCT_BUNDLE_IDENTIFIER = dev.iharness.fixture.tests; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = auto; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IHarnessFixture.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IHarnessFixture"; }; name = Debug; };
+		B00000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = {BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; GENERATE_INFOPLIST_FILE = YES; IPHONEOS_DEPLOYMENT_TARGET = 17.0; PRODUCT_BUNDLE_IDENTIFIER = dev.iharness.fixture.tests; PRODUCT_NAME = "$(TARGET_NAME)"; SDKROOT = auto; SUPPORTED_PLATFORMS = "iphoneos iphonesimulator"; SWIFT_VERSION = 5.0; TARGETED_DEVICE_FAMILY = 1; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IHarnessFixture.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IHarnessFixture"; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		800000000000000000000001 /* Build configuration list for PBXProject "IHarnessFixture" */ = {isa = XCConfigurationList; buildConfigurations = (B00000000000000000000001 /* Debug */, B00000000000000000000002 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		800000000000000000000002 /* Build configuration list for PBXNativeTarget "IHarnessFixture" */ = {isa = XCConfigurationList; buildConfigurations = (B00000000000000000000003 /* Debug */, B00000000000000000000004 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		800000000000000000000003 /* Build configuration list for PBXNativeTarget "IHarnessFixtureTests" */ = {isa = XCConfigurationList; buildConfigurations = (B00000000000000000000005 /* Debug */, B00000000000000000000006 /* Release */); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = 500000000000000000000001 /* Project object */;
+}

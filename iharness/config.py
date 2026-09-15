@@ -14,13 +14,17 @@ class HarnessConfig:
     workspace: str | None = None
     project: str | None = None
     scheme: str | None = None
+    target: str | None = None
+    sdk: str | None = None
     configuration: str = "Debug"
     device: str = "iPhone 17"
+    build_destination: str | None = None
     bundle_id: str | None = None
     app_path: str | None = None
     derived_data: str = ".iharness/DerivedData"
     result_bundle: str | None = None
     run_tests: bool = False
+    launch_wait_seconds: float = 2.0
     log_seconds: int = 10
     screenshot: bool = True
     extra_xcode_args: list[str] = field(default_factory=list)
@@ -53,13 +57,17 @@ class HarnessConfig:
             "workspace": self.workspace,
             "project": self.project,
             "scheme": self.scheme,
+            "target": self.target,
+            "sdk": self.sdk,
             "configuration": self.configuration,
             "device": self.device,
+            "build_destination": self.build_destination,
             "bundle_id": self.bundle_id,
             "app_path": self.app_path,
             "derived_data": self.derived_data,
             "result_bundle": self.result_bundle,
             "run_tests": self.run_tests,
+            "launch_wait_seconds": self.launch_wait_seconds,
             "log_seconds": self.log_seconds,
             "screenshot": self.screenshot,
             "extra_xcode_args": self.extra_xcode_args,

@@ -9,14 +9,21 @@ class ConfigTests(unittest.TestCase):
     def test_defaults_are_agent_friendly(self) -> None:
         config = HarnessConfig()
         self.assertEqual(config.configuration, "Debug")
+        self.assertIsNone(config.build_destination)
         self.assertIn(".swift", config.watch_extensions)
         self.assertTrue(config.screenshot)
+        self.assertEqual(config.launch_wait_seconds, 2.0)
 
     def test_merge_ignores_none(self) -> None:
         config = HarnessConfig(scheme="App")
         merged = config.merged({"scheme": None, "device": "iPhone 17 Pro"})
         self.assertEqual(merged.scheme, "App")
         self.assertEqual(merged.device, "iPhone 17 Pro")
+
+    def test_build_destination_round_trip(self) -> None:
+        config = HarnessConfig(build_destination="generic/platform=iOS Simulator", launch_wait_seconds=0.5)
+        self.assertEqual(HarnessConfig.from_dict(config.to_dict()).build_destination, config.build_destination)
+        self.assertEqual(HarnessConfig.from_dict(config.to_dict()).launch_wait_seconds, 0.5)
 
     def test_save_and_load(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
