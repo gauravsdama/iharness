@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import selectors
 import shutil
 import signal
 import subprocess  # nosec B404
@@ -192,7 +193,10 @@ def _start_captured_process(
     env: Mapping[str, str] | None = None,
     limit: int,
 ) -> tuple[
-    subprocess.Popen[bytes], _CappedCapture, _CappedCapture, list[threading.Thread]
+    subprocess.Popen[bytes],
+    _CappedCapture,
+    _CappedCapture,
+    list[tuple[threading.Thread, threading.Event]],
 ]:
     stdout_capture = _CappedCapture(limit)
     stderr_capture = _CappedCapture(limit)
@@ -205,34 +209,59 @@ def _start_captured_process(
         stderr=subprocess.PIPE,
         start_new_session=True,
     )
-    readers = [
-        threading.Thread(
-            target=_drain_stream, args=(process.stdout, stdout_capture), daemon=True
-        ),
-        threading.Thread(
-            target=_drain_stream, args=(process.stderr, stderr_capture), daemon=True
-        ),
-    ]
-    for reader in readers:
+    readers: list[tuple[threading.Thread, threading.Event]] = []
+    for stream, capture in (
+        (process.stdout, stdout_capture),
+        (process.stderr, stderr_capture),
+    ):
+        stop = threading.Event()
+        reader = threading.Thread(
+            target=_drain_stream,
+            args=(stream, capture, stop),
+            daemon=True,
+        )
+        readers.append((reader, stop))
         reader.start()
     return process, stdout_capture, stderr_capture, readers
 
 
-def _drain_stream(stream: object, capture: _CappedCapture) -> None:
+def _drain_stream(
+    stream: object, capture: _CappedCapture, stop: threading.Event
+) -> None:
+    descriptor = stream.fileno()  # type: ignore[attr-defined]
+    os.set_blocking(descriptor, False)
+    selector = selectors.DefaultSelector()
+    selector.register(descriptor, selectors.EVENT_READ)
+    stopped_idle_since: float | None = None
     try:
         while True:
-            chunk = stream.read(65536)  # type: ignore[attr-defined]
+            events = selector.select(timeout=0.1)
+            if not events:
+                if stop.is_set():
+                    stopped_idle_since = stopped_idle_since or time.monotonic()
+                    if time.monotonic() - stopped_idle_since >= 0.25:
+                        return
+                continue
+            stopped_idle_since = None
+            try:
+                chunk = os.read(descriptor, 65536)
+            except BlockingIOError:
+                continue
             if not chunk:
                 return
             capture.add(chunk)
     finally:
+        selector.close()
         stream.close()  # type: ignore[attr-defined]
 
 
 def _finish_readers(
-    process: subprocess.Popen[bytes], readers: list[threading.Thread]
+    process: subprocess.Popen[bytes],
+    readers: list[tuple[threading.Thread, threading.Event]],
 ) -> None:
-    for reader in readers:
+    for _, stop in readers:
+        stop.set()
+    for reader, _ in readers:
         reader.join(timeout=TERMINATION_GRACE_SECONDS)
         if reader.is_alive():
             try:
