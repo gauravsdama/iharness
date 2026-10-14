@@ -12,6 +12,7 @@ from .config import DEFAULT_CONFIG_PATH, HarnessConfig, load_config, save_config
 from .monitor import watch
 from .runner import command_exists, run_command
 from .simctl import (
+    DEFAULT_BOOT_TIMEOUT_SECONDS,
     boot_device,
     capture_logs,
     install_app,
@@ -72,7 +73,7 @@ def build_parser() -> argparse.ArgumentParser:
     boot = subparsers.add_parser("boot", help="Boot an iOS simulator.")
     boot.add_argument("--device", default=None, help="Simulator name or UDID.")
     boot.add_argument("--open", action="store_true", help="Open the Simulator app.")
-    boot.add_argument("--timeout", type=int, default=120)
+    boot.add_argument("--timeout", type=int, default=DEFAULT_BOOT_TIMEOUT_SECONDS)
     boot.set_defaults(func=cmd_boot)
 
     build = subparsers.add_parser("build", help="Run xcodebuild build.")

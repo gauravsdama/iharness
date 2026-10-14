@@ -8,6 +8,7 @@ from pathlib import Path
 from .runner import CommandResult, run_command, run_for_duration
 
 MAX_CAPTURE_SECONDS = 3600
+DEFAULT_BOOT_TIMEOUT_SECONDS = 300
 
 
 @dataclass(frozen=True)
@@ -111,7 +112,10 @@ def _device_sort_key(device: SimulatorDevice) -> tuple[object, ...]:
 
 
 def boot_device(
-    device: str | None = None, *, open_simulator: bool = False, timeout: int = 120
+    device: str | None = None,
+    *,
+    open_simulator: bool = False,
+    timeout: int = DEFAULT_BOOT_TIMEOUT_SECONDS,
 ) -> SimulatorDevice:
     selected = resolve_device(device)
     if not selected.is_booted:
