@@ -1,4 +1,5 @@
 import UIKit
+import OSLog
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -46,6 +47,10 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController = viewController
         window.makeKeyAndVisible()
         self.window = window
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            Logger(subsystem: "dev.iharness.fixture", category: "readiness")
+                .notice("IHARNESS_FIXTURE_READY")
+        }
         return true
     }
 }

@@ -1,6 +1,6 @@
-from pathlib import Path
 import tempfile
 import unittest
+from pathlib import Path
 
 from iharness.config import HarnessConfig, load_config, resolve_path, save_config
 
@@ -21,9 +21,16 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(merged.device, "iPhone 17 Pro")
 
     def test_build_destination_round_trip(self) -> None:
-        config = HarnessConfig(build_destination="generic/platform=iOS Simulator", launch_wait_seconds=0.5)
-        self.assertEqual(HarnessConfig.from_dict(config.to_dict()).build_destination, config.build_destination)
-        self.assertEqual(HarnessConfig.from_dict(config.to_dict()).launch_wait_seconds, 0.5)
+        config = HarnessConfig(
+            build_destination="generic/platform=iOS Simulator", launch_wait_seconds=0.5
+        )
+        self.assertEqual(
+            HarnessConfig.from_dict(config.to_dict()).build_destination,
+            config.build_destination,
+        )
+        self.assertEqual(
+            HarnessConfig.from_dict(config.to_dict()).launch_wait_seconds, 0.5
+        )
 
     def test_save_and_load(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -33,9 +40,21 @@ class ConfigTests(unittest.TestCase):
 
     def test_resolve_path(self) -> None:
         base = Path("/tmp/example")
-        self.assertEqual(resolve_path("App.xcodeproj", base), str((base / "App.xcodeproj").resolve()))
+        self.assertEqual(
+            resolve_path("App.xcodeproj", base), str((base / "App.xcodeproj").resolve())
+        )
         self.assertEqual(resolve_path("/Applications", base), "/Applications")
         self.assertIsNone(resolve_path(None, base))
+
+    def test_rejects_unknown_and_invalid_config_values(self) -> None:
+        with self.assertRaisesRegex(ValueError, "Unknown config field"):
+            HarnessConfig.from_dict({"log_second": 3})
+        with self.assertRaisesRegex(ValueError, "log_seconds"):
+            HarnessConfig.from_dict({"log_seconds": "3"})
+        with self.assertRaisesRegex(ValueError, "launch_wait_seconds"):
+            HarnessConfig.from_dict({"launch_wait_seconds": -1})
+        with self.assertRaisesRegex(ValueError, "watch_extensions"):
+            HarnessConfig.from_dict({"watch_extensions": ["swift"]})
 
 
 if __name__ == "__main__":

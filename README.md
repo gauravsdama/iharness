@@ -71,6 +71,8 @@ python3 -m iharness verify \
   --out .iharness/fixture-e2e
 ```
 
+The fixture is owned by this repository and contains no customer code, credentials, or personal data. Hosted CI runs its complete build, test, install, launch, screenshot, bounded-log, assertion, and cleanup lifecycle through the same standalone installer documented above.
+
 Each run writes artifacts to `.iharness/runs/<timestamp>/`:
 
 - `report.md` — concise human-readable result
@@ -83,10 +85,13 @@ Each run writes artifacts to `.iharness/runs/<timestamp>/`:
 The tool intentionally keeps Xcode inputs explicit. A useful verification configuration needs a `workspace` or `project`, `scheme`, `bundle_id`, and `app_path`. iHarness does not yet derive an app bundle from Xcode build settings; provide the bundle path you want installed.
 
 A run with no project/workspace can establish that Xcode and a Simulator are healthy, but it is not application verification. Do not treat a boot-only screenshot as evidence that an app works.
+Such a run is reported as `INCOMPLETE`, not `PASSED`; use `iharness doctor` when infrastructure health is the intended check.
 
 When the installed Simulator runtime does not match Xcode's active SDK, use `--target APP_TARGET --sdk iphonesimulator` for a build-only verification while keeping `--device` pointed at the simulator used for install, launch, and evidence. XCTest still requires a concrete runtime compatible with the selected Xcode. `--build-destination` is available when an explicit scheme destination is preferred.
 
 The verifier waits two seconds after a successful launch before taking its screenshot so the evidence captures the application rather than the Simulator home-screen transition. Override this with `--launch-wait-seconds` when an application needs more or less startup time.
+
+External commands have finite deadlines, captured stdout and stderr are capped at 1 MiB per stream, and timeouts terminate the command's process group. Reports and generated logs are written atomically; reports, screenshots, videos, and logs use owner-only permissions. Reports redact common credential forms and the current home-directory prefix, but reports and Simulator artifacts can still contain application data and should be reviewed before sharing.
 
 ## Commands
 
@@ -116,6 +121,8 @@ iHarness is a local CLI, not an MCP service. Its supported Codex integration is 
 ```
 
 Contributions should preserve explicit command inputs, bounded log/video capture, and inspection-friendly run artifacts. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+The required hosted lane runs on GitHub's `macos-26` Apple Silicon image with its current bundled Xcode. An informational `macos-15` lane exercises the same lifecycle without blocking releases. The workflow records the exact OS, architecture, Python, Xcode, and Simulator runtimes rather than claiming support for untested fixed Xcode versions. Evidence artifacts are retained for seven days.
 
 The project is licensed under Apache-2.0. A recorded end-to-end run against the bundled fixture app is tracked in the [release-readiness record](docs/RELEASE_READINESS.md).
 

@@ -43,8 +43,8 @@ while [ "$#" -gt 0 ]; do
   shift
 done
 
-script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-project_root=$(CDPATH= cd -- "$script_dir/.." && pwd)
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+project_root=$(CDPATH='' cd -- "$script_dir/.." && pwd)
 
 for command in python3 xcodebuild xcrun; do
   if ! command -v "$command" >/dev/null 2>&1; then

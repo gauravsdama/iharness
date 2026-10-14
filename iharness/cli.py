@@ -2,18 +2,28 @@ from __future__ import annotations
 
 import argparse
 import json
-from pathlib import Path
 import platform
 import shutil
 import sys
+from pathlib import Path
 
 from . import __version__
 from .config import DEFAULT_CONFIG_PATH, HarnessConfig, load_config, save_config
 from .monitor import watch
 from .runner import command_exists, run_command
-from .simctl import boot_device, capture_logs, install_app, launch_app, list_devices, record_video, take_screenshot
+from .simctl import (
+    boot_device,
+    capture_logs,
+    install_app,
+    launch_app,
+    list_devices,
+    record_video,
+    take_screenshot,
+)
 from .verify import run_verification
-from .xcode import XcodeTarget, build as xcode_build, test as xcode_test
+from .xcode import XcodeTarget
+from .xcode import build as xcode_build
+from .xcode import test as xcode_test
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -34,18 +44,28 @@ def build_parser() -> argparse.ArgumentParser:
         prog="iharness",
         description="Agent-friendly iOS simulator build, monitor, and verification harness.",
     )
-    parser.add_argument("--version", action="version", version=f"iharness {__version__}")
+    parser.add_argument(
+        "--version", action="version", version=f"iharness {__version__}"
+    )
     subparsers = parser.add_subparsers(required=True)
 
-    doctor = subparsers.add_parser("doctor", help="Check local iOS development prerequisites.")
-    doctor.add_argument("--json", action="store_true", help="Print machine-readable JSON.")
+    doctor = subparsers.add_parser(
+        "doctor", help="Check local iOS development prerequisites."
+    )
+    doctor.add_argument(
+        "--json", action="store_true", help="Print machine-readable JSON."
+    )
     doctor.set_defaults(func=cmd_doctor)
 
     devices = subparsers.add_parser("devices", help="List available simulator devices.")
-    devices.add_argument("--json", action="store_true", help="Print machine-readable JSON.")
+    devices.add_argument(
+        "--json", action="store_true", help="Print machine-readable JSON."
+    )
     devices.set_defaults(func=cmd_devices)
 
-    init = subparsers.add_parser("init", help="Create .iharness/config.json for an app workspace.")
+    init = subparsers.add_parser(
+        "init", help="Create .iharness/config.json for an app workspace."
+    )
     add_config_args(init)
     init.set_defaults(func=cmd_init)
 
@@ -64,28 +84,42 @@ def build_parser() -> argparse.ArgumentParser:
     test.set_defaults(func=cmd_test)
 
     install = subparsers.add_parser("install", help="Install an .app into a simulator.")
-    install.add_argument("--device", default="booted", help="Simulator UDID or 'booted'.")
+    install.add_argument(
+        "--device", default="booted", help="Simulator UDID or 'booted'."
+    )
     install.add_argument("--app", required=True, help="Path to .app bundle.")
     install.set_defaults(func=cmd_install)
 
     launch = subparsers.add_parser("launch", help="Launch an installed app.")
-    launch.add_argument("--device", default="booted", help="Simulator UDID or 'booted'.")
+    launch.add_argument(
+        "--device", default="booted", help="Simulator UDID or 'booted'."
+    )
     launch.add_argument("--bundle-id", required=True)
-    launch.add_argument("args", nargs=argparse.REMAINDER, help="Arguments passed to the app.")
+    launch.add_argument(
+        "args", nargs=argparse.REMAINDER, help="Arguments passed to the app."
+    )
     launch.set_defaults(func=cmd_launch)
 
-    screenshot = subparsers.add_parser("screenshot", help="Capture a simulator screenshot.")
-    screenshot.add_argument("--device", default="booted", help="Simulator UDID or 'booted'.")
+    screenshot = subparsers.add_parser(
+        "screenshot", help="Capture a simulator screenshot."
+    )
+    screenshot.add_argument(
+        "--device", default="booted", help="Simulator UDID or 'booted'."
+    )
     screenshot.add_argument("--out", default=".iharness/screenshot.png")
     screenshot.set_defaults(func=cmd_screenshot)
 
     record = subparsers.add_parser("record", help="Record a bounded simulator video.")
-    record.add_argument("--device", default="booted", help="Simulator UDID or 'booted'.")
+    record.add_argument(
+        "--device", default="booted", help="Simulator UDID or 'booted'."
+    )
     record.add_argument("--seconds", type=int, default=10)
     record.add_argument("--out", default=".iharness/simulator.mp4")
     record.set_defaults(func=cmd_record)
 
-    logs = subparsers.add_parser("logs", help="Capture simulator logs for a bounded period.")
+    logs = subparsers.add_parser(
+        "logs", help="Capture simulator logs for a bounded period."
+    )
     logs.add_argument("--device", default="booted", help="Simulator UDID or 'booted'.")
     logs.add_argument("--bundle-id", default=None)
     logs.add_argument("--predicate", default=None)
@@ -93,16 +127,27 @@ def build_parser() -> argparse.ArgumentParser:
     logs.add_argument("--out", default=".iharness/simulator.log")
     logs.set_defaults(func=cmd_logs)
 
-    verify = subparsers.add_parser("verify", help="Run an agent-friendly build/test/install/launch verification pass.")
+    verify = subparsers.add_parser(
+        "verify",
+        help="Run an agent-friendly build/test/install/launch verification pass.",
+    )
     add_config_args(verify)
-    verify.add_argument("--config", default=str(DEFAULT_CONFIG_PATH), help="Config JSON path.")
+    verify.add_argument(
+        "--config", default=str(DEFAULT_CONFIG_PATH), help="Config JSON path."
+    )
     verify.add_argument("--out", default=None, help="Verification output directory.")
     verify.set_defaults(func=cmd_verify)
 
-    watch_parser = subparsers.add_parser("watch", help="Monitor files and rerun verification after changes.")
-    watch_parser.add_argument("--config", default=str(DEFAULT_CONFIG_PATH), help="Config JSON path.")
+    watch_parser = subparsers.add_parser(
+        "watch", help="Monitor files and rerun verification after changes."
+    )
+    watch_parser.add_argument(
+        "--config", default=str(DEFAULT_CONFIG_PATH), help="Config JSON path."
+    )
     watch_parser.add_argument("--interval", type=float, default=2.0)
-    watch_parser.add_argument("--out", default=None, help="Fixed verification output directory.")
+    watch_parser.add_argument(
+        "--out", default=None, help="Fixed verification output directory."
+    )
     watch_parser.set_defaults(func=cmd_watch)
 
     return parser
@@ -110,25 +155,63 @@ def build_parser() -> argparse.ArgumentParser:
 
 def add_config_args(parser: argparse.ArgumentParser) -> None:
     add_xcode_args(parser, include_required=False)
-    parser.add_argument("--bundle-id", default=None, help="App bundle identifier for launch/log filtering.")
-    parser.add_argument("--app", dest="app_path", default=None, help="Path to built .app bundle.")
-    parser.add_argument("--run-tests", action="store_true", default=None, help="Run xcodebuild test during verify.")
-    parser.add_argument("--no-screenshot", action="store_true", help="Skip screenshot capture during verify.")
-    parser.add_argument("--launch-wait-seconds", type=float, default=None, help="Seconds to wait after launch before capturing evidence.")
+    parser.add_argument(
+        "--bundle-id",
+        default=None,
+        help="App bundle identifier for launch/log filtering.",
+    )
+    parser.add_argument(
+        "--app", dest="app_path", default=None, help="Path to built .app bundle."
+    )
+    parser.add_argument(
+        "--run-tests",
+        action="store_true",
+        default=None,
+        help="Run xcodebuild test during verify.",
+    )
+    parser.add_argument(
+        "--no-screenshot",
+        action="store_true",
+        help="Skip screenshot capture during verify.",
+    )
+    parser.add_argument(
+        "--launch-wait-seconds",
+        type=float,
+        default=None,
+        help="Seconds to wait after launch before capturing evidence.",
+    )
     parser.add_argument("--log-seconds", type=int, default=None)
-    parser.add_argument("--watch-path", action="append", dest="watch_paths", default=None)
-    parser.add_argument("--watch-extension", action="append", dest="watch_extensions", default=None)
+    parser.add_argument(
+        "--watch-path", action="append", dest="watch_paths", default=None
+    )
+    parser.add_argument(
+        "--watch-extension", action="append", dest="watch_extensions", default=None
+    )
 
 
-def add_xcode_args(parser: argparse.ArgumentParser, *, include_required: bool = True) -> None:
+def add_xcode_args(
+    parser: argparse.ArgumentParser, *, include_required: bool = True
+) -> None:
     parser.add_argument("--workspace", default=None, help="Path to .xcworkspace.")
     parser.add_argument("--project", default=None, help="Path to .xcodeproj.")
-    parser.add_argument("--scheme", default=None, required=False if not include_required else False)
-    parser.add_argument("--target", default=None, help="Xcode target name; useful with --sdk for build-only verification.")
-    parser.add_argument("--sdk", default=None, help="Explicit SDK such as iphonesimulator.")
+    parser.add_argument(
+        "--scheme", default=None, required=False if not include_required else False
+    )
+    parser.add_argument(
+        "--target",
+        default=None,
+        help="Xcode target name; useful with --sdk for build-only verification.",
+    )
+    parser.add_argument(
+        "--sdk", default=None, help="Explicit SDK such as iphonesimulator."
+    )
     parser.add_argument("--configuration", default=None)
     parser.add_argument("--device", default=None, help="Simulator name or UDID.")
-    parser.add_argument("--build-destination", default=None, help="Explicit xcodebuild destination, such as 'generic/platform=iOS Simulator'.")
+    parser.add_argument(
+        "--build-destination",
+        default=None,
+        help="Explicit xcodebuild destination, such as 'generic/platform=iOS Simulator'.",
+    )
     parser.add_argument("--derived-data", default=None)
     parser.add_argument("--result-bundle", default=None)
     parser.add_argument("--extra-xcode-arg", action="append", default=None)
@@ -142,7 +225,11 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         "simctl": None,
     }
     checks["simctl"] = "available" if checks["xcrun"] else None
-    result = run_command(["xcodebuild", "-version"]) if command_exists("xcodebuild") else None
+    result = (
+        run_command(["xcodebuild", "-version"])
+        if command_exists("xcodebuild")
+        else None
+    )
     payload = {
         "ok": bool(checks["xcodebuild"] and checks["xcrun"]),
         "checks": checks,
@@ -256,7 +343,11 @@ def cmd_logs(args: argparse.Namespace) -> int:
 
 def cmd_verify(args: argparse.Namespace) -> int:
     config = load_config(Path(args.config)).merged(config_overrides(args))
-    report = run_verification(config, cwd=Path.cwd(), output_dir=Path(args.out).resolve() if args.out else None)
+    report = run_verification(
+        config,
+        cwd=Path.cwd(),
+        output_dir=Path(args.out).resolve() if args.out else None,
+    )
     print(f"{report.status.upper()} {report.output_dir / 'report.md'}")
     return 0 if report.status == "passed" else 1
 
@@ -267,7 +358,11 @@ def cmd_watch(args: argparse.Namespace) -> int:
 
     def run_once() -> None:
         latest = load_config(config_path)
-        report = run_verification(latest, cwd=Path.cwd(), output_dir=Path(args.out).resolve() if args.out else None)
+        report = run_verification(
+            latest,
+            cwd=Path.cwd(),
+            output_dir=Path(args.out).resolve() if args.out else None,
+        )
         print(f"{report.status.upper()} {report.output_dir / 'report.md'}", flush=True)
 
     watch(
@@ -316,7 +411,8 @@ def target_from_config(config: HarnessConfig) -> XcodeTarget:
         target=config.target,
         sdk=config.sdk,
         configuration=config.configuration,
-        device=config.build_destination or (None if config.target and config.sdk else config.device),
+        device=config.build_destination
+        or (None if config.target and config.sdk else config.device),
         derived_data=config.derived_data,
         result_bundle=config.result_bundle,
         extra_args=config.extra_xcode_args,

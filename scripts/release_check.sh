@@ -1,8 +1,8 @@
 #!/bin/sh
 set -eu
 
-script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-project_root=$(CDPATH= cd -- "$script_dir/.." && pwd)
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+project_root=$(CDPATH='' cd -- "$script_dir/.." && pwd)
 mode=${1:-technical}
 case "$mode" in
   technical|--publish) ;;
@@ -26,6 +26,11 @@ fi
 
 if git ls-files | grep -Eq '(^|/)(\.iharness|DerivedData|build|dist|[^/]+\.egg-info)(/|$)'; then
   echo "Release check failed: generated output is tracked." >&2
+  exit 1
+fi
+
+if git ls-files | grep -Eiq '(^|/)(\.env($|\.)|\.DS_Store$|xcuserdata/)|\.(pem|p12|pfx|key|mobileprovision|xcuserstate)$'; then
+  echo "Release check failed: a credential, personal IDE file, or local environment file is tracked." >&2
   exit 1
 fi
 

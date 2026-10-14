@@ -9,17 +9,69 @@ permissions:
   contents: read
 
 jobs:
-  test:
-    runs-on: macos-26
-    timeout-minutes: 15
+  publication-scan:
+    name: Publication and history scan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+      - name: Scan Git history for secrets
+        uses: gitleaks/gitleaks-action@dcedce43c6f43de0b836d1fe38946645c9c638dc # v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  verify:
+    name: ${{ matrix.name }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Required · macOS 26 / current Xcode
+            os: macos-26
+            experimental: false
+          - name: Informational · macOS 15 / bundled Xcode
+            os: macos-15
+            experimental: true
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.experimental }}
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Record runner toolchain
+        run: |
+          sw_vers
+          uname -m
+          python3 --version
+          xcodebuild -version
+          xcrun simctl list runtimes
       - name: Test the clean checkout and offline installer
         run: ./scripts/release_check.sh --publish
-      - name: Test the publishable fixture on the latest bundled runtime
-        run: >-
-          xcodebuild
-          -project fixtures/IHarnessFixture/IHarnessFixture.xcodeproj
-          -scheme IHarnessFixture
-          -destination 'platform=iOS Simulator,name=iPhone 17,OS=latest'
-          test
+      - name: Build and test the wheel entry point
+        run: |
+          wheel_dir="$RUNNER_TEMP/iharness-wheel"
+          wheel_venv="$RUNNER_TEMP/iharness-wheel-venv"
+          mkdir -p "$wheel_dir"
+          python3 -m pip wheel --no-deps --wheel-dir "$wheel_dir" .
+          python3 -m venv "$wheel_venv"
+          wheel_file=$(find "$wheel_dir" -maxdepth 1 -name 'iharness-*.whl' -print -quit)
+          test -n "$wheel_file"
+          "$wheel_venv/bin/python" -m pip install --no-index --no-deps "$wheel_file"
+          "$wheel_venv/bin/iharness" --version
+          "$wheel_venv/bin/python" -c 'import importlib.metadata as m; d=m.distribution("iharness"); assert not d.requires; assert d.metadata["License-Expression"] == "Apache-2.0"'
+      - name: Exercise the installed iHarness fixture workflow
+        run: ./scripts/ci_fixture_e2e.sh
+      - name: Upload bounded fixture evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: iharness-fixture-${{ matrix.os }}
+          path: |
+            .iharness/ci-evidence/toolchain.txt
+            .iharness/ci-evidence/report.json
+            .iharness/ci-evidence/report.md
+            .iharness/ci-evidence/screenshot.png
+            .iharness/ci-evidence/simulator.log
+          if-no-files-found: warn
+          retention-days: 7

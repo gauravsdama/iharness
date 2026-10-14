@@ -5,6 +5,8 @@ from pathlib import Path
 
 from .runner import CommandResult, run_command
 
+XCODE_TIMEOUT_SECONDS = 1200.0
+
 
 @dataclass
 class XcodeTarget:
@@ -56,7 +58,12 @@ def build_xcodebuild_command(target: XcodeTarget, action: str) -> list[str]:
         command.extend(["-destination", destination_for_device(target.device)])
     if target.target:
         derived = Path(target.derived_data)
-        command.extend([f"SYMROOT={derived / 'Build' / 'Products'}", f"OBJROOT={derived / 'Build' / 'Intermediates.noindex'}"])
+        command.extend(
+            [
+                f"SYMROOT={derived / 'Build' / 'Products'}",
+                f"OBJROOT={derived / 'Build' / 'Intermediates.noindex'}",
+            ]
+        )
     else:
         command.extend(["-derivedDataPath", target.derived_data])
     if target.result_bundle:
@@ -67,8 +74,16 @@ def build_xcodebuild_command(target: XcodeTarget, action: str) -> list[str]:
 
 
 def build(target: XcodeTarget, *, cwd: Path) -> CommandResult:
-    return run_command(build_xcodebuild_command(target, "build"), cwd=str(cwd))
+    return run_command(
+        build_xcodebuild_command(target, "build"),
+        cwd=str(cwd),
+        timeout=XCODE_TIMEOUT_SECONDS,
+    )
 
 
 def test(target: XcodeTarget, *, cwd: Path) -> CommandResult:
-    return run_command(build_xcodebuild_command(target, "test"), cwd=str(cwd))
+    return run_command(
+        build_xcodebuild_command(target, "test"),
+        cwd=str(cwd),
+        timeout=XCODE_TIMEOUT_SECONDS,
+    )
