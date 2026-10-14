@@ -114,7 +114,9 @@ def _run_verification_steps(
             return
 
     if config.bundle_id:
-        launch_result = launch_app(device.udid, config.bundle_id)
+        launch_result = launch_app(
+            device.udid, config.bundle_id, terminate_running=True
+        )
         report.add_step("launch", launch_result)
         if not launch_result.ok:
             return

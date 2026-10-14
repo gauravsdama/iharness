@@ -8,6 +8,7 @@ from iharness.runner import CommandResult
 from iharness.simctl import (
     capture_logs,
     find_device,
+    launch_app,
     parse_devices_json,
     record_video,
     resolve_device,
@@ -71,6 +72,25 @@ class SimctlTests(unittest.TestCase):
             predicate = run.call_args.args[0][-1]
             self.assertIn('example\\" OR TRUEPREDICATE', predicate)
             self.assertNotIn('example" OR TRUEPREDICATE', predicate)
+
+    def test_launch_can_force_a_fresh_process(self) -> None:
+        success = CommandResult(["simctl"], 0, "", "", 0.1)
+        with patch("iharness.simctl.run_command", return_value=success) as run:
+            result = launch_app(
+                "DEVICE", "dev.iharness.fixture", terminate_running=True
+            )
+        self.assertTrue(result.ok)
+        self.assertEqual(
+            run.call_args.args[0],
+            [
+                "xcrun",
+                "simctl",
+                "launch",
+                "--terminate-running-process",
+                "DEVICE",
+                "dev.iharness.fixture",
+            ],
+        )
 
     def test_record_video_rejects_non_positive_duration(self) -> None:
         with self.assertRaisesRegex(ValueError, "greater than zero"):

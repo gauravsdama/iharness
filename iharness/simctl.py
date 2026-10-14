@@ -135,9 +135,16 @@ def install_app(device: str, app_path: str) -> CommandResult:
 
 
 def launch_app(
-    device: str, bundle_id: str, args: list[str] | None = None
+    device: str,
+    bundle_id: str,
+    args: list[str] | None = None,
+    *,
+    terminate_running: bool = False,
 ) -> CommandResult:
-    command = ["xcrun", "simctl", "launch", device, bundle_id]
+    command = ["xcrun", "simctl", "launch"]
+    if terminate_running:
+        command.append("--terminate-running-process")
+    command.extend([device, bundle_id])
     if args:
         command.extend(args)
     return run_command(command)
