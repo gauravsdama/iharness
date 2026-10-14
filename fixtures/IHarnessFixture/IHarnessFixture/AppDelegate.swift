@@ -4,6 +4,10 @@ import OSLog
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
+    private let readinessLogger = Logger(
+        subsystem: "dev.iharness.fixture",
+        category: "readiness"
+    )
 
     func application(
         _ application: UIApplication,
@@ -47,9 +51,12 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController = viewController
         window.makeKeyAndVisible()
         self.window = window
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            Logger(subsystem: "dev.iharness.fixture", category: "readiness")
-                .notice("IHARNESS_FIXTURE_READY")
+        for delay in 1...8 {
+            DispatchQueue.main.asyncAfter(
+                deadline: .now() + .seconds(delay)
+            ) { [readinessLogger] in
+                readinessLogger.notice("IHARNESS_FIXTURE_READY")
+            }
         }
         return true
     }
